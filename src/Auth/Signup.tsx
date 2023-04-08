@@ -1,18 +1,31 @@
 import {
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
+  onAuthStateChanged,
   signInWithPopup,
 } from "firebase/auth";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../Helpers/Firebase";
 
 function Signup() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [email, setEmail] = useState("");
   const [loader, setLoader] = useState(false);
+  const [password, setPassword] = useState("");
+  const [userEmail, setUserEmail] = useState("");
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUserEmail(user.email || "");
+      } else {
+        setUserEmail("");
+      }
+    });
+    return unsubscribe;
+  }, []);
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,7 +43,7 @@ function Signup() {
     }
     try {
       await createUserWithEmailAndPassword(auth, email, password);
-      navigate("/");
+      navigate("/login");
       setLoader(false);
     } catch (err: any) {
       setError(err.message);
@@ -71,6 +84,7 @@ function Signup() {
           </a>
           <div className="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
             <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
+              {error && <span className="mt-10 text-red-600">{error}</span>}
               <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                 Sign up to your account
               </h1>
@@ -158,6 +172,7 @@ function Signup() {
                   </button>
                 )}
                 <p className="text-sm font-light text-gray-500 dark:text-gray-400">
+                  Do you have an account already?
                   <a
                     onClick={() => navigate("/login")}
                     className="font-medium text-primary-600 hover:underline dark:text-primary-500 cursor-pointer"
@@ -196,11 +211,14 @@ function Signup() {
                     fill="#EB4335"
                   />
                 </svg>
-                <p className="text-base font-medium ml-4 text-gray-700">
-                  Continue with Google
-                </p>
+                {userEmail ? (
+                  <p className="text-primary-500 ml-4">{userEmail}</p>
+                ) : (
+                  <p className="text-base font-medium ml-4 text-gray-700">
+                    Continue with Google
+                  </p>
+                )}
               </button>
-              {error && <span className="mt-10 text-red-600">{error}</span>}
             </div>
           </div>
         </div>
