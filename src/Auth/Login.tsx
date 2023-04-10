@@ -45,7 +45,9 @@ function Login() {
       return;
     }
     try {
-      await signInWithEmailAndPassword(auth, email, password);
+      const { user } = await signInWithEmailAndPassword(auth, email, password);
+      const token = await user.getIdToken();
+      localStorage.setItem("token", token);
       navigate("/dashboard");
       setLoader(false);
     } catch (err: any) {
@@ -58,7 +60,8 @@ function Login() {
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
-      const user = result.user;
+      const token = await result.user.getIdToken();
+      localStorage.setItem("token", token);
       navigate("/dashboard");
       setLoader(false);
     } catch (error: any) {
@@ -249,13 +252,13 @@ function Login() {
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path
-                        fill-rule="evenodd"
-                        clip-rule="evenodd"
+                        fillRule="evenodd"
+                        clipRule="evenodd"
                         d="M6.74679 7.32698C6.81572 6.97016 7.11946 6.70305 7.48791 6.67524L16.3927 6.00308C17.2586 5.93772 18.0255 6.5486 18.1399 7.39469L19.1989 15.2289C19.266 15.7252 19.0941 16.2238 18.734 16.5778L15.249 20.003C14.6101 20.631 14.6101 21.6492 15.249 22.2773L26.0703 32.9129C26.7093 33.541 27.7452 33.541 28.3842 32.9129L31.9155 29.4422C32.2491 29.1143 32.7106 28.9439 33.1815 28.9748L40.4744 29.4535C41.3402 29.5104 42.0103 30.2216 42.0014 31.0745L41.9038 40.4946C41.8998 40.8786 41.6201 41.2063 41.236 41.2768C31.653 43.0365 21.353 41.8809 13.7437 34.4021C6.12265 26.9117 4.92626 16.7508 6.74679 7.32698Z"
                         stroke="black"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
                       />
                     </svg>
                   </button>
@@ -271,7 +274,7 @@ function Login() {
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
                     >
-                      <g clip-path="url(#clip0_17_24)">
+                      <g clipPath="url(#clip0_17_24)">
                         <path
                           d="M48 24C48 10.7452 37.2548 0 24 0C10.7452 0 0 10.7452 0 24C0 35.9789 8.77641 45.908 20.25 47.7084V30.9375H14.1562V24H20.25V18.7125C20.25 12.6975 23.8331 9.375 29.3152 9.375C31.9402 9.375 34.6875 9.84375 34.6875 9.84375V15.75H31.6613C28.68 15.75 27.75 17.6002 27.75 19.5V24H34.4062L33.3422 30.9375H27.75V47.7084C39.2236 45.908 48 35.9789 48 24Z"
                           fill="#1877F2"
